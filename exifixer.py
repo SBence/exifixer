@@ -1,7 +1,6 @@
 import os
 import re
 from datetime import datetime
-from PIL import Image
 import piexif
 import argparse
 
@@ -42,8 +41,7 @@ for root, _, files in os.walk(args.directory):
                     log(f"📝 Dry-run: {relative_path} -> {formatted_time}")
 
                 else:
-                    img = Image.open(file_path)
-                    exif_dict = piexif.load(img.info.get("exif", b""))
+                    exif_dict = piexif.load(file_path)
 
                     encoded_time = formatted_time.encode("utf-8")
                     exif_dict["0th"][piexif.ImageIFD.DateTime] = encoded_time
@@ -51,7 +49,7 @@ for root, _, files in os.walk(args.directory):
                     exif_dict["Exif"][piexif.ExifIFD.DateTimeDigitized] = encoded_time
 
                     exif_bytes = piexif.dump(exif_dict)
-                    img.save(file_path, "jpeg", exif=exif_bytes)
+                    piexif.insert(exif_bytes, file_path)
 
                     count_success += 1
 
