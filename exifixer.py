@@ -4,7 +4,7 @@ from datetime import datetime
 import piexif
 import argparse
 
-parser = argparse.ArgumentParser(description='Set EXIF timestamps of JPEG images based on file names')
+parser = argparse.ArgumentParser(description='Set EXIF timestamps of JPEG and WebP images based on file names')
 
 parser.add_argument('directory', help='Path to the folder containing images')
 parser.add_argument('--dry-run', action='store_true', help='Show updates without modifying files')
@@ -14,7 +14,7 @@ verbosity_group.add_argument('-v', '--verbose', action='store_true', help='Show 
 
 args = parser.parse_args()
 
-pattern = re.compile(r"(\d{8})_(\d{6})\.(?:jpe?g)$", re.IGNORECASE)
+pattern = re.compile(r"(?:\w{3}_)?(\d{8})_(\d{6})(?:_\d{3})?\.(?:jpe?g|webp)$", re.IGNORECASE)
 summary_separator = "    "
 
 count_success = 0
@@ -62,7 +62,7 @@ for root, _, files in os.walk(args.directory):
 
         else:
             count_skipped += 1
-            log(f"⏭️  Skipped: {relative_path} (Unsupported file name or not a JPG file)")
+            log(f"⏭️  Skipped: {relative_path} (Unsupported file name, or not a JPEG or a WebP file)")
 
 if args.dry_run:
     log(f"📝 Would update: {count_success}{summary_separator}⏭️  Skipped: {count_skipped}{summary_separator}❌ Errors: {count_error}")
